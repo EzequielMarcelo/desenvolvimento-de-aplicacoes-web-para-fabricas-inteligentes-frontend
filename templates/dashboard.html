@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Temperatura</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+        .metric-box {
+            background-color: #1f1f3a;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        h1, h2 {
+            color: #e0e0e0;
+        }
+        .charts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .chart {
+            flex: 1 1 45%;
+            background-color: #1f1f3a;
+            padding: 1rem;
+            border-radius: 10px;
+            min-width: 300px;
+            box-sizing: border-box;
+        }
+        a {
+            color: #8e24aa;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>📈 Dashboard de Temperatura</h1>
+
+    <div class="metric-box">
+        <h2>Métricas</h2>
+        <p><strong>Temperatura Mínima:</strong> {{ temp_min }} ºC</p>
+        <p><strong>Temperatura Máxima:</strong> {{ temp_max }} ºC</p>
+        <p><strong>Temperatura Média:</strong> {{ temp_media }} ºC</p>
+        <p><strong>Tempo de Operação:</strong> {{ tempo_operacao }} horas</p>
+    </div>
+
+   <div class="charts">
+    <div class="chart">
+        <h3>Histórico de Temperatura</h3>
+        {{ graph_linha | safe }}
+    </div>
+    <div class="chart">
+        <h3>Temperatura Atual</h3>
+        {{ graph_circular | safe }}
+    </div>
+</div>
+    </div>
+
+    <br><br>
+    <a href="/settings" style="color:#8e24aa;">⚙️ Ir para Configurações</a>
+</body>
+</html>

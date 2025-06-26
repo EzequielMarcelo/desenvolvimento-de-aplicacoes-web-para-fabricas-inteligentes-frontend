@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurações</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+        h1 {
+            color: #e0e0e0;
+        }
+        form {
+            background-color: #1f1f3a;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        input, select {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #4a4a8a;
+            background-color: #3e3e70;
+            color: #e0e0e0;
+        }
+        button {
+            background-color: #6a1b9a;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚙️ Configurações</h1>
+    <form method="POST">
+        <label for="nome_usuario">Nome do Usuário</label>
+        <input type="text" id="nome_usuario" name="nome_usuario" value="Usuário Padrão" required>
+
+        <label for="tema">Tema</label>
+        <select id="tema" name="tema">
+            <option value="Escuro" selected>Escuro</option>
+            <option value="Claro">Claro</option>
+        </select>
+
+        <label><input type="checkbox" name="notificacoes" checked> Receber notificações por e-mail</label>
+
+        <br><br>
+        <button type="submit">Salvar Configurações</button>
+    </form>
+
+    <br>
+    <a href="/" style="color:#8e24aa;">🏠 Voltar para o Dashboard</a>
+</body>
+</html>
