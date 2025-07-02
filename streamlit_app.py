@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
@@ -202,14 +203,14 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+max_temp = 0.0
+min_temp = 100.0
 
-# --- Dados de Exemplo ---
-dados_temp = {
-    'Mês': ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'],
-    'Valor': [25, 30, 32, 36, 40, 46, 47, 50, 49, 51, 55, 60]
-}
+res = requests.get("http://localhost:8000/temperatura")
+dados_temp = res.json()
 
 df_temp = pd.DataFrame(dados_temp)
+df_temp['timestamp'] = pd.to_datetime(df_temp['timestamp'])
 
 dados_categorias = {
     'Categoria': ['Cat A', 'Cat B', 'Cat C', 'Cat D', 'Cat E'],
@@ -217,24 +218,37 @@ dados_categorias = {
 }
 df_categorias = pd.DataFrame(dados_categorias)
 
-progresso_total = {'Temp': 70, 'Faltante': 30}
-porcentagem_concluida = progresso_total['Faltante']
+current_temp = df_temp['valor'].iloc[-1]
+
+progresso_total = {'Temp': current_temp, 'Faltante': 100 - current_temp}
+porcentagem_concluida = progresso_total['Temp']
 
 # --- Funções para as "Páginas" ---
 
 def mostrar_dashboard_principal():
+    global max_temp, min_temp
+
     st.title("Análise de Dados")
 
     # Seção de Métricas (topo)
     st.markdown("### Visão Geral")
     col_metric1, col_metric2, col_metric3, col_metric4 = st.columns(4)
+    
+    new_min_temp = df_temp['valor'].min()
+    new_max_temp = df_temp['valor'].max()
+
+    if new_min_temp < min_temp:
+        min_temp = new_min_temp
+
+    if new_max_temp > max_temp:
+        max_temp = new_max_temp
 
     with col_metric1:
-        st.metric(label="Temperatura Mínima", value=25)
+        st.metric(label="Temperatura Mínima", value=f"{min_temp:.2f}")
     with col_metric2:
-        st.metric(label="Temperatura Máxima", value=df_temp['Valor'].max())
+        st.metric(label="Temperatura Máxima", value=f"{max_temp:.2f}")
     with col_metric3:
-        st.metric(label="Temperatura Média", value=df_temp['Valor'].min())
+        st.metric(label="Temperatura Média", value=f"{df_temp['valor'].mean():.2f}")
     with col_metric4:
         st.metric(label="Tempo de Operação (H)", value="8.5")
 
@@ -247,7 +261,7 @@ def mostrar_dashboard_principal():
 
     with col_graph1:
         st.markdown("#### Historico de temperatura")
-        fig_linha = go.Figure(data=go.Scatter(x=df_temp['Mês'], y=df_temp['Valor'], mode='lines+markers', line=dict(color='#6a1b9a', width=3), marker=dict(size=8, color='#c85dd1')))
+        fig_linha = go.Figure(data=go.Scatter(x=df_temp['timestamp'], y=df_temp['valor'], mode='lines+markers', line=dict(color='#6a1b9a', width=3), marker=dict(size=8, color='#c85dd1')))
         fig_linha.update_layout(
             xaxis_title="Hora",
             yaxis_title="Temperatura",
