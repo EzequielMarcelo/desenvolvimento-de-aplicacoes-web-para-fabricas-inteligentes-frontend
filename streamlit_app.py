@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.graph_objects as go
-import numpy as np
+import time
 
 # --- Configurações da Página ---
 st.set_page_config(
@@ -364,5 +364,7 @@ with st.sidebar:
 # serão chamadas apenas quando a pagina_atual for a correta.
 if st.session_state.pagina_atual == 'dashboard':
     mostrar_dashboard_principal()
+    time.sleep(5)
+    st.rerun()
 elif st.session_state.pagina_atual == 'configuracoes':
     mostrar_pagina_configuracoes()
