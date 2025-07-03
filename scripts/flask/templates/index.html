@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Flask</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" alt="Python Logo" class="logo">
+                <h2>Matemática</h2>
+            </div>
+            <hr>
+            <a href="{{ url_for('dashboard') }}" class="sidebar-item active">🏠 Home</a>
+            <hr>
+            <div class="sidebar-expander">
+                <input type="checkbox" id="disciplinas-toggle" class="expander-checkbox">
+                <label for="disciplinas-toggle" class="expander-label">📚 Disciplinas ▼</label>
+                <div class="expander-content">
+                    <p>- 📐 Matemática</p>
+                    <p>- 🌐 Português</p>
+                </div>
+            </div>
+            <hr>
+            <a href="{{ url_for('settings') }}" class="sidebar-item">⚙️ Configurações</a>
+        </div>
+
+        <div class="main-content">
+            <h1>Análise de Dados</h1>
+
+            <h3>Visão Geral</h3>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-label">Total de Conteúdos</span>
+                    <span class="metric-value">{{ total_conteudos }}</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Conteúdos Concluídos</span>
+                    <span class="metric-value">{{ conteudos_concluidos }}</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Média de Progresso</span>
+                    <span class="metric-value">{{ media_progresso }}</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Pontuação Média</span>
+                    <span class="metric-value">{{ pontuacao_media }}</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <h3>Gráficos de Análise</h3>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h4>Desempenho Mensal (Linha)</h4>
+                    <div id="lineChart"></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Conteúdos por Categoria (Barras)</h4>
+                    <div id="barChart"></div>
+                </div>
+                <div class="chart-card">
+                    <h4>Progresso Geral (Circular com %)</h4>
+                    <div id="circularChart"></div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h3>Meus Conteúdos</h3>
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'todos')">Todos</button>
+                <button class="tab-button" onclick="openTab(event, 'concluidos')">Concluídos</button>
+            </div>
+
+            <div id="todos" class="tab-content active">
+                {% for content in conteudos_data %}
+                <div class="content-item">
+                    <div class="content-item-details">
+                        <h4>{{ content.nome }}</h4>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ content.progresso }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="content-item-actions">
+                        <button class="action-button edit">Edit</button>
+                        <button class="action-button delete">Delete</button>
+                        <button class="action-button info">Info</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="concluidos" class="tab-content">
+                {% for content in conteudos_data %}
+                {% if content.concluido %}
+                <div class="content-item">
+                    <div class="content-item-details">
+                        <h4>{{ content.nome }}</h4>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ content.progresso }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="content-item-actions">
+                        <button class="action-button edit">Edit</button>
+                        <button class="action-button delete">Delete</button>
+                        <button class="action-button info">Info</button>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% if not conteudos_data | selectattr('concluido') | list %}
+                <p class="info-message">Nenhum conteúdo concluído ainda.</p>
+                {% endif %}
+            </div>
+
+            <button class="add-button">+ Adicionar Conteúdo</button>
+        </div>
+    </div>
+
+    <script>
+        // Renderiza os gráficos Plotly
+        Plotly.newPlot('lineChart', JSON.parse({{ line_chart_json | tojson }}).data, JSON.parse({{ line_chart_json | tojson }}).layout);
+        Plotly.newPlot('barChart', JSON.parse({{ bar_chart_json | tojson }}).data, JSON.parse({{ bar_chart_json | tojson }}).layout);
+        Plotly.newPlot('circularChart', JSON.parse({{ circular_chart_json | tojson }}).data, JSON.parse({{ circular_chart_json | tojson }}).layout);
+
+        // Lógica das abas
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        // Abre a aba 'todos' por padrão ao carregar a página
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector(".tab-button.active").click();
+        });
+    </script>
+</body>
+</html>
